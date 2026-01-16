@@ -1,0 +1,1875 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>نظام شؤون طلاب الجامعة</title>
+
+<style>
+*{box-sizing:border-box;margin:0;font-family:"Segoe UI",Tahoma}
+body{background:#f1f5f9;color:#0f172a}
+
+/* ===== LAYOUT ===== */
+.dashboard{display:flex;min-height:100vh}
+
+/* ===== SIDEBAR ===== */
+.sidebar{
+  width:260px;
+  background:#0f172a;
+  color:white;
+  position:fixed;
+  right:0;
+  top:0;
+  height:100vh;
+  padding:25px 15px;
+}
+.logo{
+  text-align:center;
+  margin-bottom:40px;
+}
+.logo img{
+  width:120px;
+  height: 120px;
+  border-radius:50%;
+}
+.logo h3{margin-top:10px;font-weight:600}
+
+.sidebar a{
+  display:block;
+  padding:14px 16px;
+  margin-bottom:8px;
+  border-radius:10px;
+  color:#cbd5f5;
+  text-decoration:none;
+  cursor:pointer;
+  transition:.25s;
+}
+.sidebar a:hover,
+.sidebar a.active{
+  background:#1e293b;
+  color:white;
+}
+
+/* ===== CONTENT ===== */
+.content{
+  margin-right:260px;
+  padding:35px;
+  width:100%;
+}
+
+/* ===== PAGES ===== */
+.page{display:none}
+.page.active{display:block}
+
+/* ===== DASHBOARD CARDS ===== */
+.stats{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:25px;
+  margin-top:25px;
+}
+.stat{
+  background:white;
+  padding:25px;
+  border-radius:16px;
+  box-shadow:0 6px 20px rgba(0,0,0,.08);
+}
+.stat h2{font-size:32px;color:#2563eb}
+.stat p{color:#64748b;margin-top:8px}
+
+/* ===== TABLE ===== */
+.card{
+  background:white;
+  padding:25px;
+  border-radius:16px;
+  box-shadow:0 6px 20px rgba(0,0,0,.08);
+  margin-top:25px;
+}
+table{
+  width:100%;
+  border-collapse:collapse;
+}
+th,td{
+  padding:14px;
+  text-align:center;
+  border-bottom:1px solid #e2e8f0;
+}
+th{color:#475569;font-weight:600}
+
+/* ===== FORM ===== */
+form{
+  max-width:600px;
+  margin:auto;
+  background:white;
+  padding:35px;
+  border-radius:18px;
+  box-shadow:0 6px 20px rgba(0,0,0,.1);
+}
+input,select{
+  width:100%;
+  padding:14px;
+  margin-bottom:18px;
+  border-radius:10px;
+  border:1px solid #cbd5e1;
+}
+button{
+  width:100%;
+  padding:14px;
+  background:#2563eb;
+  color:white;
+  border:none;
+  border-radius:12px;
+  cursor:pointer;
+}
+
+/* ===== STATUS ===== */
+.status.active{color:#16a34a;font-weight:600}
+.status.inactive{color:#dc2626;font-weight:600}
+
+.status.active{
+  color:#16a34a;
+  font-weight:bold;
+}
+
+.status.inactive{
+  color:#dc2626;
+  font-weight:bold;
+}
+
+.btn{
+  padding:6px 12px;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  color:white;
+}
+
+.btn.active{
+  background:#16a34a;
+}
+
+.btn.inactive{
+  background:#dc2626;
+}
+#searchInput
+{
+  margin-top: 30px;
+}
+#form
+{
+margin-top: 40px;
+}
+
+.status.active { color:#16a34a; font-weight:bold; }
+.status.inactive { color:#dc2626; font-weight:bold; }
+.btn { padding:6px 12px; border:none; border-radius:8px; cursor:pointer; color:white; }
+.btn.active { background:#16a34a; }
+.btn.inactive { background:#dc2626; }
+
+.btn.active-btn { background:#28a745; }  /* أخضر للمنتظم */
+.btn.inactive-btn { background:#dc3545; } /* أحمر للموقوف */
+.sidebar a.active { background:#334155; }  /* أزرق غامق */
+ 
+.stats
+{
+ margin-right: 250px;
+}
+
+.edit-btn{
+  background: transparent;   /* بدون خلفية */
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  margin-right: 8px;
+  color: #475569;            /* رمادي أنيق */
+}
+
+.edit-btn:hover{
+  color: #2563eb;            /* أزرق عند المرور */
+}
+
+
+.edit-btn{
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  margin-right: 6px;
+}
+.delete-btn{
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.delete-btn{
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  color: #dc2626;
+  margin-right: 6px;
+}
+.delete-btn:hover{
+  color:#991b1b;
+}
+
+button{
+  width:100%;
+  padding:14px;
+  background:#2563eb;
+  color:white;
+  border:none;
+  border-radius:12px;
+  cursor:pointer;
+}
+
+#editModal button{
+  width:auto;
+  padding:10px 18px;
+}
+#editModal input{
+  width:100%;
+  padding:10px;
+  margin-bottom:12px;
+  border-radius:10px;
+  border:1px solid #cbd5e1;
+  font-size:14px;
+}
+#editModal{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.6);
+  z-index:9999;
+
+  /* يجعل المحتوى في المنتصف */
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.edit-actions{
+  position:sticky;
+  bottom:0;
+  background:white;
+  padding-top:10px;
+}
+
+.staffTable{
+  width: 50%;
+  align-items: center;
+  justify-content: center;
+  
+}
+
+
+/* ===== هيئة التدريس ===== */
+.staff-card{
+  max-width: 1100px;
+  margin: 40px auto;   /* توسيط في الصفحة */
+}
+
+.staff-table{
+  width: 100%;
+  font-size: 16px;     /* تكبير الخط */
+  
+
+}
+
+.staff-table th{
+  background:#f8fafc;
+  font-size: 17px;
+  padding: 16px;
+}
+
+.staff-table td{
+  padding: 14px;
+  font-size: 15px;
+}
+
+/* توسيط العناوين */
+#staff h1{
+  text-align: center;
+  margin-bottom: 20px;
+}
+.card
+{
+  align-items: center;
+  align-content: center;
+}
+#staffTable
+{
+  width: 100%;
+  margin: 40px;
+  
+}
+#staff
+{
+  min-width: 200vh;
+}
+
+/* ===== تنسيق نظام المقررات ===== */
+
+.course-dept-card{
+  margin-bottom: 30px;
+  border-radius: 18px;
+}
+
+.course-dept-card h2{
+  text-align: center;
+  margin-bottom: 20px;
+  color:#1e293b;
+}
+
+.course-year{
+  margin-bottom: 20px;
+}
+
+.course-year h3{
+  background:#e2e8f0;
+  padding:10px 15px;
+  border-radius:10px;
+  color:#334155;
+  margin-bottom: 10px;
+}
+
+/* الفصل */
+.course-semester{
+  background:#f8fafc;
+  border:1px solid #e2e8f0;
+  border-radius:14px;
+  padding:15px;
+  margin-bottom: 15px;
+}
+
+.course-semester strong{
+  display:block;
+  margin-bottom:10px;
+  color:#2563eb;
+}
+
+/* المواد */
+.course-list{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+}
+
+.course-item{
+  background:#2563eb;
+  color:white;
+  padding:6px 14px;
+  border-radius:20px;
+  font-size:14px;
+}
+
+/* ===== تنسيق نظام المقررات ===== */
+
+/* بطاقة القسم */
+.course-dept-card{
+  background:white;
+  border-radius:18px;
+  padding:25px;
+  margin-bottom:35px;
+  box-shadow:0 6px 20px rgba(0,0,0,.08);
+}
+
+/* اسم القسم */
+.course-dept-card h2{
+  text-align:center;
+  margin-bottom:25px;
+  color:#1e293b;
+}
+
+/* ===== السنة (فضي) ===== */
+.course-year{
+  background:linear-gradient(135deg,#e5e7eb,#f8fafc);
+  padding:15px 20px;
+  border-radius:14px;
+  margin-bottom:20px;
+  border-right:6px solid #94a3b8;
+}
+
+.course-year h3{
+  margin-bottom:15px;
+  color:#334155;
+  font-size:18px;
+}
+
+/* ===== الفصل ===== */
+.course-semester{
+  background:#ffffff;
+  border:1px solid #e2e8f0;
+  border-radius:12px;
+  padding:15px;
+  margin-bottom:15px;
+}
+
+.course-semester strong{
+  display:block;
+  margin-bottom:12px;
+  color:#2563eb;
+  font-size:15px;
+}
+
+/* ===== المواد ===== */
+.course-list{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+}
+
+.course-item{
+  background:#2563eb;
+  color:white;
+  padding:6px 16px;
+  border-radius:20px;
+  font-size:14px;
+}
+
+
+
+</style>
+
+
+</head>
+
+<body>
+
+<div class="dashboard">
+
+<!-- ===== SIDEBAR ===== -->
+<div class="sidebar">
+  <div class="logo">
+    <img src="images/logo.jfif" id="">
+    <h3>شؤون الطلاب</h3>
+  </div>
+  <a class="active" onclick="showPage('dashboard',this)">لوحة التحكم</a>
+  <a onclick="showPage('students',this)">الطلاب</a>
+  <a onclick="showPage('faculties',this)">الكليات</a>
+  <a onclick="showPage('departments',this)">الأقسام</a>
+  <a onclick="showPage('courses',this)">المقررات</a>
+  <a onclick="showPage('register',this)">التسجيل الجامعي</a>
+  <a onclick="showPage('staff',this)">هيئة التدريس</a>
+</div>
+
+<div class="content">
+
+<!-- ===== DASHBOARD ===== -->
+<div id="dashboard" class="page active">
+  
+  <div class="card" style="margin-top:20px;">
+  <h3>إضافة قسم جديد</h3><br><br>
+
+  <select id="facultySelect">
+    <option disabled selected>اختر الكلية</option>
+    <option>كلية العلوم الطبيعية والتكنولوجيا</option>
+    <option>كلية الهندسة</option>
+    <option>كلية العلوم</option>
+    <!-- يمكنك إضافة باقي الكليات هنا -->
+  </select>
+
+  <input type="text" id="departmentName" placeholder="اسم القسم">
+
+ <button id="addBtn" onclick="addDepartment()">إضافة القسم</button>
+</div>
+  
+
+
+
+<div class="card" style="margin-top:25px">
+  <h3>إضافة مدرس</h3><br>
+
+  <input id="staffName" placeholder="اسم المدرس">
+  <input id="staffUniversity" placeholder="خريج/ة جامعة">
+  <input id="staffExperience" placeholder="الخبرات">
+
+  <button onclick="addStaff()">إضافة المدرس</button>
+</div>
+<div class="card" style="margin-top:25px">
+  <h3>إضافة مقرر</h3><br>
+
+  <select id="courseDept">
+    <option disabled selected>اختر القسم</option>
+    <option>هندسة الحاسوب</option>
+    <option>هندسة اتصالات</option>
+    <option>رياضيات</option>
+  </select>
+
+  <select id="courseYear">
+    <option disabled selected>اختر السنة</option>
+    <option>السنة الأولى</option>
+    <option>السنة الثانية</option>
+    <option>السنة الثالثة</option>
+    <option>السنة الرابعة</option>
+  </select>
+
+  <select id="courseSemester">
+    <option disabled selected>اختر الفصل</option>
+    <option>الفصل الأول</option>
+    <option>الفصل الثاني</option>
+  </select>
+
+  <input id="courseName" placeholder="اسم المادة">
+
+  <button onclick="addCourseSystem()">إضافة المادة</button>
+</div>
+
+</div>
+
+
+
+
+
+<!-- ===== STUDENTS ===== -->
+<div id="students" class="page">
+ 
+
+  <!-- البحث بالاسم -->
+  <input type="text" id="searchInput" placeholder="ابحث باسم الطالب..." 
+  style="padding:8px 12px; width:100%; max-width:400px; margin-bottom:15px; border-radius:8px; border:1px solid #ccc;">
+  <input type="text" id="idSearchInput"
+       placeholder="ابحث بالرقم الجامعي..."
+       style="padding:8px 12px; width:100%; max-width:400px; 
+              margin-bottom:15px; border-radius:8px; border:1px solid #ccc;">
+
+  <!-- الفلتر حسب الحالة -->
+  <select id="statusFilter" style="padding:8px 12px; width:100%; max-width:200px; margin-bottom:20px; border-radius:8px; border:1px solid #ccc;">
+    <option value="all">الكل</option>
+    <option value="active">منتظم</option>
+    <option value="inactive">موقوف</option>
+  </select>
+ <select id="departmentFilter"
+  style="padding:8px 12px; width:100%; max-width:250px; margin-bottom:20px;
+         border-radius:8px; border:1px solid #ccc;">
+  <option value="all">كل الأقسام</option>
+  <option value="هندسة الحاسوب">هندسة الحاسوب</option>
+  <option value="هندسة اتصالات">هندسة اتصالات</option>
+  <option value="هندسة ميكاترونيك">هندسة ميكاترونيك</option>
+  <option value="رياضيات">رياضيات</option>
+  <option value="فيزياء">فيزياء</option>
+  <option value="كيمياء">كيمياء</option>
+</select>
+
+  <div class="card">
+    <table id="studentsTableAdmin">
+      <tr>
+  <th>الصورة</th>
+  <th>الرقم الجامعي</th>
+  <th>تحكم</th>
+  <th>الحالة</th>
+  <th>الاسم</th>
+  <th>الكلية</th>
+  <th>القسم</th>
+  <th>مكان الولادة</th>
+  <th>تاريخ الميلاد</th>
+  <th>العنوان</th>
+  <th>الهاتف</th>
+  <th>اسم الأم</th>
+  <th>اسم الأب</th>
+ 
+  
+  <th>تاريخ الإنشاء</th>
+  <th>آخر تعديل</th>
+  <th>الجنس</th>
+</tr>
+
+
+    </table><br><br>
+
+     </div>
+
+<div class="stats" style="display:flex; gap:30px;">
+     <div class="stat" style="background:#f0f4f8; padding:20px; border-radius:10px; text-align:center;">
+      <h2 id="studentCount">0</h2>
+      <p>عدد الطلاب الكلي</p>
+     </div>
+     <div class="stat" style="background:#f0f4f8; padding:20px; border-radius:10px; text-align:center;">
+      <h2 id="activeCount">0</h2>
+      <p>عدد المنتظمين</p>
+     </div>
+     <div class="stat" style="background:#f0f4f8; padding:20px; border-radius:10px; text-align:center;">
+      <h2 id="inactiveCount">0</h2>
+      <p>عدد الموقوفين</p>
+
+  </div>
+  </div>
+</div>
+
+
+
+<!-- ===== FACULTIES ===== -->
+<div id="faculties" class="page">
+  
+  <div class="card">
+    <table id="facultiesTable">
+  <tr>
+    <th>اسم الكلية</th>
+    <th>العميد</th>
+    <th>تحكم</th>
+  </tr>
+  <tr>
+    <td>كلية العلوم الطبيعية والتكنولوجيا</td>
+    <td>د. محمد سالم</td>
+    <td>
+      <button class="edit-btn" onclick="editFaculty(this)">✏️</button>
+    </td>
+  </tr>
+</table>
+  </div>
+</div>
+
+
+<!-- ===== DEPARTMENTS ===== -->
+<div id="departments" class="page">
+ 
+
+  <div class="card">
+    <table id="departmentsTable">
+      <tr>
+        <th>رقم القسم</th>
+        <th>اسم القسم</th>
+        <th>الكلية</th>
+      </tr>
+    </table>
+  </div>
+</div>
+
+<!-- ===== COURSES ===== -->
+<div id="courses" class="page">
+  
+  <div class="card">
+    <div id="coursesContainer"></div>
+  </div>
+</div>
+
+
+
+<!-- ===== REGISTER ===== -->
+<!-- صفحة التسجيل -->
+<div id="register" class="page">
+  <h1>التسجيل الجامعي</h1>
+  <form id="form">
+    <input type="file">
+    <input placeholder="الرقم الجامعي" required>
+    <input placeholder="الاسم الكامل" required>
+    <select required>
+      <option disabled selected>اختر الكلية</option>
+      <option>كلية العلوم الطبيعية والتكنولوجيا</option>
+    </select>
+    <select required>
+      <option disabled selected>اختر القسم</option>
+      <option>هندسة الحاسوب</option>
+      <option>هندسة اتصالات</option>
+      <option>هندسة ميكاترونيك</option>
+      <option>علوم الحياة</option>
+      <option> رياضيات</option>
+      <option>كيمياء</option>
+      <option>فيزياء</option>
+
+
+
+
+    </select>
+            
+<input placeholder="مكان الولادة">
+<input type="date">
+<input placeholder="العنوان">
+<input placeholder="رقم الهاتف">
+<input placeholder="اسم الأم">
+<input placeholder="اسم الأب">
+<select id="editGender">
+  <option value="ذكر">ذكر</option>
+  <option value="أنثى">أنثى</option>
+</select>
+ <button type="button" onclick="addStudentFromRegister()">
+  تسجيل الطالب
+</button>
+  </form>
+</div>
+
+</div>
+
+
+<!-- ===== STAFF ===== -->
+<div id="staff" class="page" >
+  <h1 class="page-title"> </h1>
+
+  <div class="staff-wrapper">
+    <div class="card">
+      <table id="staffTable" >
+        <tr>
+          <th>اسم المدرس</th>
+          <th>خريج/ة جامعة</th>
+          <th>الخبرات</th>
+          <th>تحكم</th>
+        </tr>
+      </table>
+    </div>
+  </div>
+</div>
+
+</div>
+</div>
+
+<script>
+function showPage(id,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.querySelectorAll('.sidebar a').forEach(a=>a.classList.remove('active'));
+  el.classList.add('active');
+}
+function registerStudent(e){
+  e.preventDefault();
+  alert("تم تسجيل الطالب بنجاح ✅");
+  e.target.reset();
+}
+
+
+</script>
+<script>
+function toggleStatus(button){
+  const row = button.closest("tr");
+  const statusCell = row.querySelector(".status");
+
+  if(statusCell.classList.contains("active")){
+    statusCell.classList.remove("active");
+    statusCell.classList.add("inactive");
+    statusCell.textContent = "موقوف";
+
+    button.classList.remove("active");
+    button.classList.add("inactive");
+    button.textContent = "موقوف";
+  } else {
+    statusCell.classList.remove("inactive");
+    statusCell.classList.add("active");
+    statusCell.textContent = "منتظم";
+
+    button.classList.remove("inactive");
+    button.classList.add("active");
+    button.textContent = "منتظم";
+  }
+
+  // تحديث الفلتر بعد تغيير الحالة
+  filterTable();
+}
+
+// ===== البحث عن الاسم =====
+const searchInput = document.getElementById("searchInput");
+const statusFilter = document.getElementById("statusFilter");
+
+searchInput.addEventListener("keyup", filterTable);
+statusFilter.addEventListener("change", filterTable);
+
+function filterTable(){
+  const filterText = searchInput.value.toLowerCase();
+  const filterStatus = statusFilter.value;
+  const table = document.getElementById("studentsTable");
+  const trs = table.getElementsByTagName("tr");
+
+  for(let i=1; i<trs.length; i++){ // تخطي صف العناوين
+    const tdName = trs[i].getElementsByTagName("td")[1]; // عمود الاسم
+    const tdStatus = trs[i].getElementsByTagName("td")[4]; // عمود الحالة
+    if(tdName && tdStatus){
+      const nameMatch = tdName.textContent.toLowerCase().includes(filterText);
+      const statusMatch = (filterStatus === "all") || 
+                          (filterStatus === "active" && tdStatus.classList.contains("active")) ||
+                          (filterStatus === "inactive" && tdStatus.classList.contains("inactive"));
+
+      trs[i].style.display = (nameMatch && statusMatch) ? "" : "none";
+    }
+  }
+}
+</script>
+
+<script>
+const form = document.getElementById("form");
+const table = document.getElementById("studentsTable");
+const searchInput = document.getElementById("searchInput");
+const statusFilter = document.getElementById("statusFilter");
+
+// زر افتراضي لفتح صفحة الطلاب عند العودة من البروفايل
+document.getElementById('studentsLink')?.addEventListener('click', ()=> showPage('students', document.querySelector('#studentsLink')));
+
+// ===== اضافة طالب جديد =====
+form.addEventListener("submit", function(e){
+  e.preventDefault();
+  const inputs = form.querySelectorAll("input, select");
+  const studentData = Array.from(inputs).map(i => i.value);
+
+  addStudent(...studentData, "active"); // الحالة الافتراضية: منتظم
+
+  form.reset();
+  alert("تم تسجيل الطالب بنجاح ✅");
+});
+
+function addStudent(id, name, faculty, department, status){
+  const row = table.insertRow(-1);
+
+  row.insertCell(0).textContent = id;
+
+  const nameCell = row.insertCell(1);
+  nameCell.textContent = name;
+  nameCell.classList.add("student-name");
+  nameCell.onclick = function(){ openProfile(nameCell); };
+
+  row.insertCell(2).textContent = faculty;
+  row.insertCell(3).textContent = department;
+
+  const statusCell = row.insertCell(4);
+  statusCell.textContent = (status==="active") ? "منتظم" : "موقوف";
+  statusCell.className = "status " + status;
+
+  const btnCell = row.insertCell(5);
+  const btn = document.createElement("button");
+  btn.className = "btn " + status;
+  btn.textContent = (status==="active") ? "منتظم" : "موقوف";
+  btn.onclick = function(){ toggleStatus(btn); };
+  btnCell.appendChild(btn);
+
+  filterTable();
+}
+
+// ===== تغيير الحالة =====
+function toggleStatus(btn){
+  const row = btn.parentElement.parentElement;
+  const status = row.querySelector('.status');
+
+  if(status.classList.contains('active')){
+    status.className = 'status inactive';
+    status.textContent = 'موقوف';
+    btn.className = 'btn inactive-btn';
+    btn.textContent = 'موقوف';
+  } else {
+    status.className = 'status active';
+    status.textContent = 'منتظم';
+    btn.className = 'btn active-btn';
+    btn.textContent = 'منتظم'; 
+  }
+
+  updateStudentCount(); // ✅ تحديث الأعداد بعد تغيير الحالة
+}
+
+
+// ===== البحث + فلتر الحالة =====
+searchInput.addEventListener("keyup", filterTable);
+statusFilter.addEventListener("change", filterTable);
+
+function filterTable(){
+  const filterText = searchInput.value.toLowerCase();
+  const filterStatus = statusFilter.value;
+  const trs = table.getElementsByTagName("tr");
+
+  for(let i=1; i<trs.length; i++){
+    const tdName = trs[i].cells[1];
+    const tdStatus = trs[i].cells[4];
+    if(tdName && tdStatus){
+      const nameMatch = tdName.textContent.toLowerCase().includes(filterText);
+      const statusMatch = (filterStatus==="all") ||
+                          (filterStatus==="active" && tdStatus.classList.contains("active")) ||
+                          (filterStatus==="inactive" && tdStatus.classList.contains("inactive"));
+      trs[i].style.display = (nameMatch && statusMatch) ? "" : "none";
+    }
+  }
+}
+
+// ===== تغيير الصفحات =====
+function showPage(id, el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+</script>
+
+<script>
+  function updateStudentCount() {
+  const table = document.getElementById("studentsTable");
+  const rows = table.getElementsByTagName("tr");
+  let total = 0;
+  let active = 0;
+  let inactive = 0;
+
+  for (let i = 1; i < rows.length; i++) { // i=1 لتجاهل صف العنوان
+    total++;
+    const statusCell = rows[i].cells[4];
+    if (statusCell.classList.contains("active")) active++;
+    else if (statusCell.classList.contains("inactive")) inactive++;
+  }
+
+  document.getElementById("studentCount").textContent = total;
+  document.getElementById("activeCount").textContent = active;
+  document.getElementById("inactiveCount").textContent = inactive;
+}
+updateStudentCount(); // بعد إضافة الصف
+updateStudentCount(); // بعد تغيير الحالة
+
+window.addEventListener("load", function() {
+  updateStudentCount();
+});
+
+</script>
+<script>
+function toggleStatus(btn){
+  const row = btn.closest("tr");
+  const statusCell = row.cells[3];
+
+  if(statusCell.classList.contains("active")){
+    statusCell.className = "status inactive";
+    statusCell.textContent = "موقوف";
+    btn.textContent = "موقوف";
+    btn.className = "btn inactive-btn";
+  } else {
+    statusCell.className = "status active";
+    statusCell.textContent = "منتظم";
+    btn.textContent = "منتظم";
+    btn.className = "btn active-btn";
+  }
+
+  row.cells[14].textContent = getNowDate();
+  saveStudents();
+  updateStudentCount();
+}
+
+function updateStudentCount(){
+ let count = 0;
+students.forEach(student => {
+    if (selectedDept === 'الكل' || student.department === selectedDept) {
+        // هنا تضع الكود الذي يضيف الصف للجدول
+        count++;
+    }
+});
+studentCount.textContent = count; // عدّ الطلاب بعد الفلتر
+
+}
+
+</script>
+
+<script>
+const idSearchInput = document.getElementById("idSearchInput");
+
+idSearchInput.addEventListener("keyup", filterByUniversityId);
+
+function filterByUniversityId(){
+  const filterText = idSearchInput.value.toLowerCase();
+  const table = document.getElementById("studentsTable");
+  const trs = table.getElementsByTagName("tr");
+
+  for(let i = 1; i < trs.length; i++){
+    const tdId = trs[i].cells[0]; // الرقم الجامعي
+    if(tdId){
+      const match = tdId.textContent.toLowerCase().includes(filterText);
+      trs[i].style.display = match ? "" : "none";
+    }
+  }
+}
+</script>
+<script>
+function addStudentFromRegister(){
+
+  const form = document.getElementById("form");
+  const inputs = form.querySelectorAll("input, select");
+
+  const imageFile = inputs[0].files[0];
+
+  const student = {
+  image: "",
+  id: inputs[1].value.trim(),
+  name: inputs[2].value.trim(),
+  faculty: inputs[3].value,
+  department: inputs[4].value,
+  birthPlace: inputs[5].value,
+  birthDate: inputs[6].value,
+  address: inputs[7].value,
+  phone: inputs[8].value,
+  mother: inputs[9].value,
+  father: inputs[10].value,
+  gender: inputs[11].value,   // ✅ هذا هو الحل
+  status: "active",
+  createdAt: getNowDate(),
+  updatedAt: "-"
+};
+
+
+  // تحقق بسيط
+  if(!student.id || !student.name){
+    alert("الرجاء إدخال الرقم الجامعي والاسم");
+    return;
+  }
+
+  // إذا في صورة
+  if(imageFile){
+    const reader = new FileReader();
+    reader.onload = function(e){
+      student.image = e.target.result;
+      createStudentRow(student);
+      saveStudents();
+      updateStudentCount();
+      form.reset();
+      alert("تم تسجيل الطالب بنجاح ✅");
+    };
+    reader.readAsDataURL(imageFile);
+  }
+  // بدون صورة
+  else{
+    createStudentRow(student);
+    saveStudents();
+    updateStudentCount();
+    form.reset();
+    alert("تم تسجيل الطالب بنجاح ✅");
+  }
+}
+</script>
+
+
+
+<!-- -------------------------edit -->
+
+<script>
+function editStudent(row){
+
+  const editBtn = row.querySelector(".edit-btn");
+
+  // ===== حفظ =====
+  if(editBtn.dataset.mode === "edit"){
+
+    for(let i of [4,5,6,7,8,9,10,11,12]){
+      const input = row.cells[i].querySelector("input");
+      if(input) row.cells[i].textContent = input.value;
+    }
+
+    row.cells[14].textContent = getNowDate(); // آخر تعديل
+    editBtn.innerHTML = "✏️";
+    editBtn.dataset.mode = "view";
+
+    saveStudents();
+    return;
+  }
+
+  // ===== تعديل =====
+  for(let i of [4,5,6,7,8,9,10,11,12]){
+    const text = row.cells[i].textContent;
+    row.cells[i].innerHTML = `<input value="${text}" style="width:100%">`;
+  }
+
+  editBtn.innerHTML = "💾";
+  editBtn.dataset.mode = "edit";
+}
+</script>
+
+
+<script>
+function createStudentRow(s){
+  const table = document.getElementById("studentsTableAdmin");
+  const row = table.insertRow(-1);
+
+  // الصورة
+  row.insertCell(0).innerHTML = s.image
+    ? `<img src="${s.image}" style="width:40px;height:40px;border-radius:50%">`
+    : "—";
+
+  // الرقم الجامعي
+  row.insertCell(1).textContent = s.id;
+
+  // التحكم
+  const controlCell = row.insertCell(2);
+
+  const statusBtn = document.createElement("button");
+  statusBtn.textContent = s.status === "inactive" ? "موقوف" : "منتظم";
+  statusBtn.className = "btn " + (s.status === "inactive" ? "inactive-btn" : "active-btn");
+  statusBtn.onclick = ()=> toggleStatus(statusBtn);
+
+  const editBtn = document.createElement("button");
+  editBtn.innerHTML = "✏️";
+  editBtn.className = "edit-btn";
+  editBtn.onclick = ()=> openEditStudent(row);
+
+  const deleteBtn = document.createElement("button");
+  deleteBtn.innerHTML = "🗑️";
+  deleteBtn.className = "delete-btn";
+  deleteBtn.onclick = ()=> deleteStudent(row);
+
+  controlCell.append(statusBtn, editBtn, deleteBtn);
+
+  // الحالة
+  const statusCell = row.insertCell(3);
+  statusCell.textContent = s.status === "inactive" ? "موقوف" : "منتظم";
+  statusCell.className = "status " + (s.status === "inactive" ? "inactive" : "active");
+
+  row.insertCell(4).textContent = s.name;
+  row.insertCell(5).textContent = s.faculty;
+  row.insertCell(6).textContent = s.department;
+  row.insertCell(7).textContent = s.birthPlace;
+  row.insertCell(8).textContent = s.birthDate;
+  row.insertCell(9).textContent = s.address;
+  row.insertCell(10).textContent = s.phone;
+  row.insertCell(11).textContent = s.mother;
+  row.insertCell(12).textContent = s.father;
+  row.insertCell(13).textContent = s.createdAt;
+  row.insertCell(14).textContent = s.updatedAt;
+  row.insertCell(15).textContent = s.gender || "-";
+
+}
+
+</script>
+
+
+
+
+<script>
+function refreshStudentsFeatures(){
+
+  const table = document.getElementById("studentsTableAdmin");
+  if(!table) return;
+
+  const rows = table.getElementsByTagName("tr");
+
+  let total = 0, active = 0, inactive = 0;
+
+  for(let i = 1; i < rows.length; i++){
+    total++;
+
+    const statusCell = rows[i].cells[4];
+    if(statusCell.classList.contains("active")) active++;
+    else if(statusCell.classList.contains("inactive")) inactive++;
+  }
+
+  // تحديث العدادات
+  document.getElementById("studentCount").textContent = total;
+  document.getElementById("activeCount").textContent = active;
+  document.getElementById("inactiveCount").textContent = inactive;
+}
+
+/* ===== البحث بالاسم والرقم معًا ===== */
+
+  function unifiedSearch(){
+  const nameVal = searchInput.value.toLowerCase();
+  const idVal   = idSearchInput.value.toLowerCase();
+  const statusVal = statusFilter.value;
+
+  const table = document.getElementById("studentsTableAdmin");
+
+  for(let i = 1; i < table.rows.length; i++){
+    const row = table.rows[i];
+
+    const idCell = row.cells[1];
+    const nameCell = row.cells[4];
+    const statusCell = row.cells[3];
+
+    const matchId = idCell.textContent.toLowerCase().includes(idVal);
+    const matchName = nameCell.textContent.toLowerCase().includes(nameVal);
+    const matchStatus =
+      statusVal === "all" ||
+      (statusVal === "active" && statusCell.classList.contains("active")) ||
+      (statusVal === "inactive" && statusCell.classList.contains("inactive"));
+
+    row.style.display = (matchId && matchName && matchStatus) ? "" : "none";
+  }
+
+  updateStudentCount();
+}
+
+
+/* ===== ربط الأحداث ===== */
+document.getElementById("searchInput")?.addEventListener("keyup", unifiedSearch);
+document.getElementById("idSearchInput")?.addEventListener("keyup", unifiedSearch);
+document.getElementById("statusFilter")?.addEventListener("change", unifiedSearch);
+</script>
+
+<script>
+  function deleteStudent(row){
+  if(!confirm("هل أنت متأكد من حذف هذا الطالب؟")) return;
+
+  row.remove();          // حذف من الجدول
+  saveStudents();        // تحديث localStorage
+  updateStudentCount();  // تحديث العدادات
+}
+</script>
+
+
+
+
+<script>
+function updateCounters(){
+  const table = document.getElementById("studentsTableAdmin");
+  if(!table) return;
+
+  const rows = table.getElementsByTagName("tr");
+
+  let total = 0;
+  let active = 0;
+  let inactive = 0;
+
+  for(let i = 1; i < rows.length; i++){
+    // نحسب فقط الصفوف الظاهرة
+    if(rows[i].style.display === "none") continue;
+
+    total++;
+    const statusCell = rows[i].cells[4];
+
+    if(statusCell.classList.contains("active")) active++;
+    if(statusCell.classList.contains("inactive")) inactive++;
+  }
+
+  document.getElementById("studentCount").textContent = total;
+  document.getElementById("activeCount").textContent = active;
+  document.getElementById("inactiveCount").textContent = inactive;
+}
+</script>
+
+
+
+<script>
+
+function updateStudentCount(){
+  const table = document.getElementById("studentsTableAdmin");
+  if(!table) return;
+
+  let total = 0, active = 0, inactive = 0;
+
+  for(let i = 1; i < table.rows.length; i++){
+    const row = table.rows[i];
+    if(row.style.display === "none") continue;
+
+    total++;
+    const statusCell = row.cells[3];
+
+    if(statusCell.classList.contains("active")) active++;
+    if(statusCell.classList.contains("inactive")) inactive++;
+  }
+
+  document.getElementById("studentCount").textContent = total;
+  document.getElementById("activeCount").textContent = active;
+  document.getElementById("inactiveCount").textContent = inactive;
+}
+
+</script>
+
+
+
+
+<script>
+function saveStudents(){
+  const table = document.getElementById("studentsTableAdmin");
+  if(!table) return;
+
+  const students = [];
+
+  for(let i = 1; i < table.rows.length; i++){
+    const r = table.rows[i];
+
+    students.push({
+      image: r.cells[0].querySelector("img")?.src || "",
+      id: r.cells[1].textContent,
+      status: r.cells[3].classList.contains("active") ? "active" : "inactive",
+      name: r.cells[4].textContent,
+      faculty: r.cells[5].textContent,
+      department: r.cells[6].textContent,
+      birthPlace: r.cells[7].textContent,
+      birthDate: r.cells[8].textContent,
+      address: r.cells[9].textContent,
+      phone: r.cells[10].textContent,
+      mother: r.cells[11].textContent,
+      father: r.cells[12].textContent,
+      createdAt: r.cells[13].textContent,
+      updatedAt: r.cells[14].textContent,
+      gender: r.cells[15].textContent,
+
+    });
+  }
+
+  localStorage.setItem("studentsData", JSON.stringify(students));
+}
+
+
+
+function loadStudents(){
+  const data = JSON.parse(localStorage.getItem("studentsData") || "[]");
+
+  const table = document.getElementById("studentsTableAdmin");
+  while(table.rows.length > 1){
+    table.deleteRow(1);
+  }
+
+  data.forEach(student => createStudentRow(student));
+
+  updateStudentCount();
+}
+
+window.addEventListener("load", loadStudents);
+
+</script>
+
+
+
+ <script>
+    const table = document.getElementById("departmentsTable");
+
+    function createEditButton(row) {
+      const editCell = row.insertCell(3);
+      const editBtn = document.createElement("button");
+      editBtn.textContent = "تعديل";
+
+      editBtn.addEventListener("click", function() {
+        const nameCell = row.cells[1];
+        const facultyCell = row.cells[2];
+
+        if (editBtn.textContent === "تعديل") {
+          nameCell.innerHTML = `<input type="text" value="${nameCell.textContent}">`;
+          facultyCell.innerHTML = `<input type="text" value="${facultyCell.textContent}">`;
+          editBtn.textContent = "حفظ";
+        } else {
+          const newName = nameCell.querySelector("input").value.trim();
+          const newFaculty = facultyCell.querySelector("input").value.trim();
+
+          if (!newName || !newFaculty) {
+            alert("الرجاء إدخال اسم القسم والكلية");
+            return;
+          }
+
+          nameCell.textContent = newName;
+          facultyCell.textContent = newFaculty;
+          editBtn.textContent = "تعديل";
+
+          saveDepartments(); // << حفظ التغييرات مباشرة
+        }
+      });
+
+      editCell.appendChild(editBtn);
+    }
+
+    function addDepartment() {
+      const faculty = document.getElementById("facultySelect").value;
+      const name = document.getElementById("departmentName").value.trim();
+
+      if (!faculty || faculty === "اختر الكلية") {
+        alert("اختر الكلية أولاً");
+        return;
+      }
+      if (!name) {
+        alert("ادخل اسم القسم");
+        return;
+      }
+
+      const row = table.insertRow(-1);
+      const id = Date.now();
+
+      row.insertCell(0).textContent = id;
+      row.insertCell(1).textContent = name;
+      row.insertCell(2).textContent = faculty;
+
+      createEditButton(row);
+
+      saveDepartments(); // حفظ الإضافة
+
+      document.getElementById("departmentName").value = "";
+      document.getElementById("facultySelect").selectedIndex = 0;
+      alert("تمت إضافة القسم بنجاح ✅");
+    }
+
+    function saveDepartments() {
+      const data = [];
+      for (let i = 1; i < table.rows.length; i++) {
+        data.push({
+          id: table.rows[i].cells[0].textContent,
+          name: table.rows[i].cells[1].textContent,
+          faculty: table.rows[i].cells[2].textContent
+        });
+      }
+      localStorage.setItem("departmentsData", JSON.stringify(data));
+    }
+
+    function loadDepartments() {
+      const data = JSON.parse(localStorage.getItem("departmentsData") || "[]");
+
+      while (table.rows.length > 1) {
+        table.deleteRow(1);
+      }
+
+      data.forEach(d => {
+        const row = table.insertRow(-1);
+        row.insertCell(0).textContent = d.id;
+        row.insertCell(1).textContent = d.name;
+        row.insertCell(2).textContent = d.faculty;
+        createEditButton(row);
+      });
+    }
+
+    document.getElementById("addBtn").addEventListener("click", addDepartment);
+    window.addEventListener("load", loadDepartments);
+  </script>
+
+
+<!-- ---------------------------------- -->
+
+<script>
+function getNowDate(){
+  const d = new Date();
+  return d.toLocaleString("ar-EG");
+}
+</script>
+
+
+
+
+
+<script>
+/* ===== إصلاح العدّادات بعد الفلترة ===== */
+document.getElementById("statusFilter")?.addEventListener("change", fixCountersAfterFilter);
+document.getElementById("searchInput")?.addEventListener("keyup", fixCountersAfterFilter);
+document.getElementById("idSearchInput")?.addEventListener("keyup", fixCountersAfterFilter);
+
+function fixCountersAfterFilter(){
+  const table = document.getElementById("studentsTableAdmin");
+  if(!table) return;
+
+  let total = 0;
+  let active = 0;
+  let inactive = 0;
+
+  for(let i = 1; i < table.rows.length; i++){
+    const row = table.rows[i];
+   
+
+    total++;
+
+    if(statusCell.classList.contains("active")) active++;
+    if(statusCell.classList.contains("inactive")) inactive++;
+  }
+
+  document.getElementById("studentCount").textContent = total;
+  document.getElementById("activeCount").textContent = active;
+  document.getElementById("inactiveCount").textContent = inactive;
+}
+</script>
+
+
+
+<!-- نافذة تعديل الطالب -->
+<div id="editModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999;">
+  <div style="background:white; width:90%; max-width:600px; max-height:85vh; overflow-y:auto; padding:25px; border-radius:16px;">
+    <h3 style="margin-bottom:20px">تعديل بيانات الطالب</h3>
+
+    <input id="editId" disabled placeholder="الرقم الجامعي">
+    <input id="editName" placeholder="الاسم الكامل">
+    <input id="editFaculty" placeholder="الكلية">
+    <input id="editDepartment" placeholder="القسم">
+    <input id="editBirthPlace" placeholder="مكان الولادة">
+    <input id="editBirthDate" type="date">
+    <input id="editAddress" placeholder="العنوان">
+    <input id="editPhone" placeholder="رقم الهاتف">
+    <input id="editMother" placeholder="اسم الأم">
+    <input id="editFather" placeholder="اسم الأب">
+    <input id="editgender" placeholder="الجنس ">
+
+    <div class="edit-actions" style="display:flex; gap:10px; margin-top:15px">
+      <button type="button" onclick="saveEditStudent()">حفظ</button>
+      <button type="button" onclick="closeEditModal()">إلغاء</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let currentEditRow = null;
+
+function openEditStudent(row){
+  currentEditRow = row;
+
+  editId.value = row.cells[1].textContent;
+  editName.value = row.cells[4].textContent;
+  editFaculty.value = row.cells[5].textContent;
+  editDepartment.value = row.cells[6].textContent;
+  editBirthPlace.value = row.cells[7].textContent;
+  editBirthDate.value = row.cells[8].textContent;
+  editAddress.value = row.cells[9].textContent;
+  editPhone.value = row.cells[10].textContent;
+  editMother.value = row.cells[11].textContent;
+  editFather.value = row.cells[12].textContent;
+
+  document.getElementById("editModal").style.display = "flex"; // يظهر فقط عند الضغط
+}
+
+
+function closeEditModal(){
+  document.getElementById("editModal").style.display = "none";
+  currentEditRow = null;
+}
+
+
+</script>
+
+
+
+<script>
+function saveEditStudent(){
+  if(!currentEditRow) return;
+
+  currentEditRow.cells[4].textContent  = editName.value;
+  currentEditRow.cells[5].textContent  = editFaculty.value;
+  currentEditRow.cells[6].textContent  = editDepartment.value;
+  currentEditRow.cells[7].textContent  = editBirthPlace.value;
+  currentEditRow.cells[8].textContent  = editBirthDate.value;
+  currentEditRow.cells[9].textContent  = editAddress.value;
+  currentEditRow.cells[10].textContent = editPhone.value;
+  currentEditRow.cells[11].textContent = editMother.value;
+  currentEditRow.cells[12].textContent = editFather.value;
+  currentEditRow.cells[14].textContent = getNowDate(); // آخر تعديل
+
+  saveStudents();
+  updateStudentCount();
+  closeEditModal();
+}
+</script>
+
+
+
+
+<script>
+function editFaculty(btn){
+  const row = btn.closest("tr");
+
+  // ===== حفظ =====
+  if(btn.dataset.mode === "edit"){
+    const nameInput = row.cells[0].querySelector("input");
+    const deanInput = row.cells[1].querySelector("input");
+
+    row.cells[0].textContent = nameInput.value;
+    row.cells[1].textContent = deanInput.value;
+
+    btn.innerHTML = "✏️";
+    btn.dataset.mode = "view";
+
+    saveFaculties(); // ✅ حفظ بعد التعديل
+    return;
+  }
+
+  // ===== تعديل =====
+  const name = row.cells[0].textContent;
+  const dean = row.cells[1].textContent;
+
+  row.cells[0].innerHTML = `<input value="${name}" style="width:100%">`;
+  row.cells[1].innerHTML = `<input value="${dean}" style="width:100%">`;
+
+  btn.innerHTML = "💾";
+  btn.dataset.mode = "edit";
+}
+</script>
+
+
+
+<script>
+function saveFaculties(){
+  const table = document.getElementById("facultiesTable");
+  const data = [];
+
+  for(let i = 1; i < table.rows.length; i++){
+    data.push({
+      name: table.rows[i].cells[0].textContent,
+      dean: table.rows[i].cells[1].textContent
+    });
+  }
+
+  localStorage.setItem("facultiesData", JSON.stringify(data));
+}
+
+function loadFaculties(){
+  const data = JSON.parse(localStorage.getItem("facultiesData") || "[]");
+  if(!data.length) return;
+
+  const table = document.getElementById("facultiesTable");
+
+  // حذف الصفوف القديمة
+  while(table.rows.length > 1){
+    table.deleteRow(1);
+  }
+
+  data.forEach(f => {
+    const row = table.insertRow(-1);
+    row.insertCell(0).textContent = f.name;
+    row.insertCell(1).textContent = f.dean;
+    row.insertCell(2).innerHTML =
+      `<button class="edit-btn" onclick="editFaculty(this)">✏️</button>`;
+  });
+}
+
+// تحميل تلقائي عند فتح الصفحة
+window.addEventListener("load", loadFaculties);
+</script>
+
+
+
+<script>
+function addStaff(){
+  const name = staffName.value.trim();
+  const uni  = staffUniversity.value.trim();
+  const exp  = staffExperience.value.trim();
+
+  if(!name || !uni || !exp){
+    alert("الرجاء إدخال جميع البيانات");
+    return;
+  }
+
+  createStaffRow({name, uni, exp});
+  saveStaff();
+
+  staffName.value = "";
+  staffUniversity.value = "";
+  staffExperience.value = "";
+}
+
+// ===== إنشاء صف =====
+function createStaffRow(s){
+  const table = document.getElementById("staffTable");
+  const row = table.insertRow(-1);
+
+  row.insertCell(0).textContent = s.name;
+  row.insertCell(1).textContent = s.uni;
+  row.insertCell(2).textContent = s.exp;
+
+  const control = row.insertCell(3);
+
+  const editBtn = document.createElement("button");
+  editBtn.innerHTML = "✏️";
+  editBtn.className = "edit-btn";
+  editBtn.onclick = ()=> editStaff(editBtn);
+
+  const delBtn = document.createElement("button");
+  delBtn.innerHTML = "🗑️";
+  delBtn.className = "delete-btn";
+  delBtn.onclick = ()=>{
+    if(confirm("حذف المدرس؟")){
+      row.remove();
+      saveStaff();
+    }
+  };
+
+  control.append(editBtn, delBtn);
+}
+
+// ===== تعديل =====
+function editStaff(btn){
+  const row = btn.closest("tr");
+
+  if(btn.dataset.mode === "edit"){
+    for(let i=0;i<3;i++){
+      row.cells[i].textContent = row.cells[i].querySelector("input").value;
+    }
+    btn.innerHTML = "✏️";
+    btn.dataset.mode = "view";
+    saveStaff();
+    return;
+  }
+
+  for(let i=0;i<3;i++){
+    row.cells[i].innerHTML = `<input value="${row.cells[i].textContent}" style="width:100%">`;
+  }
+
+  btn.innerHTML = "💾";
+  btn.dataset.mode = "edit";
+}
+
+// ===== حفظ =====
+function saveStaff(){
+  const table = document.getElementById("staffTable");
+  const data = [];
+
+  for(let i=1;i<table.rows.length;i++){
+    data.push({
+      name: table.rows[i].cells[0].textContent,
+      uni:  table.rows[i].cells[1].textContent,
+      exp:  table.rows[i].cells[2].textContent
+    });
+  }
+
+  localStorage.setItem("staffData", JSON.stringify(data));
+}
+
+// ===== تحميل =====
+function loadStaff(){
+  const data = JSON.parse(localStorage.getItem("staffData") || "[]");
+  data.forEach(s => createStaffRow(s));
+}
+
+window.addEventListener("load", loadStaff);
+</script>
+
+
+
+<script>
+const departmentFilter = document.getElementById("departmentFilter");
+
+function unifiedSearchWithDepartment(){
+  const nameVal   = searchInput.value.toLowerCase();
+  const idVal     = idSearchInput.value.toLowerCase();
+  const statusVal = statusFilter.value;
+  const deptVal   = departmentFilter.value;
+
+  const table = document.getElementById("studentsTableAdmin");
+  if(!table) return;
+
+  for(let i = 1; i < table.rows.length; i++){
+    const row = table.rows[i];
+
+    const idCell     = row.cells[1];
+    const nameCell   = row.cells[4];
+    const deptCell   = row.cells[6];
+    const statusCell = row.cells[3];
+
+    const matchId   = idCell.textContent.toLowerCase().includes(idVal);
+    const matchName = nameCell.textContent.toLowerCase().includes(nameVal);
+
+    const matchDept =
+      deptVal === "all" ||
+      deptCell.textContent === deptVal;
+
+    const matchStatus =
+      statusVal === "all" ||
+      (statusVal === "active" && statusCell.classList.contains("active")) ||
+      (statusVal === "inactive" && statusCell.classList.contains("inactive"));
+
+    row.style.display =
+      (matchId && matchName && matchDept && matchStatus) ? "" : "none";
+  }
+
+  updateStudentCount(); // ✅ دائمًا في النهاية
+}
+
+/* ===== ربط الأحداث ===== */
+searchInput.addEventListener("keyup", unifiedSearchWithDepartment);
+idSearchInput.addEventListener("keyup", unifiedSearchWithDepartment);
+statusFilter.addEventListener("change", unifiedSearchWithDepartment);
+departmentFilter.addEventListener("change", unifiedSearchWithDepartment);
+</script>
+
+
+
+<script>
+function getCoursesSystem(){
+  return JSON.parse(localStorage.getItem("coursesSystem") || "{}");
+}
+
+function saveCoursesSystem(data){
+  localStorage.setItem("coursesSystem", JSON.stringify(data));
+}
+</script>
+
+
+<script>
+function addCourseSystem(){
+  const dept = courseDept.value;
+  const year = courseYear.value;
+  const sem  = courseSemester.value;
+  const name = courseName.value.trim();
+
+  if(!dept || !year || !sem || !name){
+    alert("أدخل جميع البيانات");
+    return;
+  }
+
+  const data = getCoursesSystem();
+
+  if(!data[dept]) data[dept] = {};
+  if(!data[dept][year]) data[dept][year] = {};
+  if(!data[dept][year][sem]) data[dept][year][sem] = [];
+
+  data[dept][year][sem].push(name);
+
+  saveCoursesSystem(data);
+  renderCoursesSystem();
+
+  courseName.value = "";
+  courseDept.selectedIndex = 0;
+  courseYear.selectedIndex = 0;
+  courseSemester.selectedIndex = 0;
+
+  alert("تمت إضافة المادة ✅");
+}
+</script>
+
+
+
+<script>
+function renderCoursesSystem(){
+  const container = document.getElementById("coursesContainer");
+  if(!container) return;
+
+  container.innerHTML = "";
+  const data = getCoursesSystem();
+
+  for(const dept in data){
+ const deptCard = document.createElement("div");
+ deptCard.className = "course-dept-card";
+ deptCard.innerHTML = `<h2>${dept}</h2>`;
+
+
+
+    for(const year in data[dept]){
+     const yearBlock = document.createElement("div");
+     yearBlock.className = "course-year";
+     yearBlock.innerHTML = `<h3>${year}</h3>`;
+
+
+      for(const sem in data[dept][year]){
+       const semBlock = document.createElement("div");
+       semBlock.className = "course-semester";
+       semBlock.innerHTML = `<strong>${sem}</strong>`;
+
+        const ul = document.createElement("ul");
+
+        data[dept][year][sem].forEach((course, index)=>{
+          const li = document.createElement("li");
+          li.style.display = "flex";
+          li.style.justifyContent = "space-between";
+          li.style.alignItems = "center";
+
+          li.innerHTML = `
+            <span>${course}</span>
+            <span>
+              <button class="edit-btn" onclick="editCourse('${dept}','${year}','${sem}',${index})">✏️</button>
+              <button class="delete-btn" onclick="deleteCourse('${dept}','${year}','${sem}',${index})">🗑️</button>
+            </span>
+          `;
+
+          ul.appendChild(li);
+        });
+
+        semBlock.appendChild(ul);
+        yearBlock.appendChild(semBlock);
+      }
+
+      deptCard.appendChild(yearBlock);
+    }
+
+    container.appendChild(deptCard);
+  }
+}
+</script>
+
+<script>
+  function editCourse(dept, year, sem, index){
+  const data = getCoursesSystem();
+  const oldName = data[dept][year][sem][index];
+
+  const newName = prompt("تعديل اسم المادة:", oldName);
+  if(!newName) return;
+
+  data[dept][year][sem][index] = newName.trim();
+  saveCoursesSystem(data);
+  renderCoursesSystem();
+}
+
+function deleteCourse(dept, year, sem, index){
+  if(!confirm("هل تريد حذف هذه المادة؟")) return;
+
+  const data = getCoursesSystem();
+  data[dept][year][sem].splice(index,1);
+
+  saveCoursesSystem(data);
+  renderCoursesSystem();
+}
+</script>
+<script>
+window.addEventListener("load", renderCoursesSystem);
+</script>
+
+</body>
+</html>   
